@@ -14,12 +14,8 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(cookieParser());
-
-// MongoDB connection
-mongoose.connect("mongodb://localhost:27017/secrets", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+ 
+const MONGO_URI = "mongodb+srv://maruthisathish03:Mohana123@project1.v1qksi8.mongodb.net/?retryWrites=true&w=majority&appName=project1";
 
 // Secret for JWT
 const JWT_SECRET = "mySuperSecretKey";
@@ -45,6 +41,11 @@ function authenticateToken(req, res, next) {
     next();
   });
 }
+
+mongoose.connect(MONGO_URI)
+  .then(async () => {
+    console.log("Connected to MongoDB Atlas");
+  });
 
 // GET routes
 app.get("/", (req, res) => res.render("home"));
