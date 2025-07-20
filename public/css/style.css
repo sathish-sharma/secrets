@@ -1,0 +1,31 @@
+body {
+  background-color: #EBECEF;
+  font-family: 'Courier New', Courier, monospace;
+}
+.centered {
+  padding: 200px 20px;
+  text-align: center;
+}
+.secret-text {
+  text-align: center;
+  font-size: 2rem;
+  color: #fff;
+  background-color: #000;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+.btn {
+  min-width: 120px;
+}
+.card {
+  margin-top: 20px;
+}
+label {
+  font-weight: 500;
+}
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  text-align: left;
+}
