@@ -8,13 +8,12 @@ body {
   align-items: center;
   min-height: 100vh;
 }
-html {
-  box-sizing: border-box;
-}
 .centered {
   padding: 20px 20px;
   text-align: center;
   justify-content: center;
+  align-items: center;
+  display: flex;
 }
 .form {
   background-color: #ffffff;
@@ -49,7 +48,15 @@ textarea {
   border-radius: 6px;
   margin-bottom: 20px;
   font-size: 1rem;
-  box-sizing: border-box;
+}
+.secret-text {
+  text-align: center;
+  font-size: 2rem;
+  color: #fff;
+  background-color: #000;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 10px;
 }
 
 button {
@@ -71,14 +78,12 @@ button:hover {
   font-weight: bold;
   margin-bottom: 15px;
 }
-
-a {
-  text-decoration: none;
-  color: #007BFF;
-}
-
-a:hover {
-  text-decoration: underline;
+.btn {
+  width: 30%;
+  min-width: 100px;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
 }
 @media screen and (max-width: 480px) {
   html, body {
@@ -90,6 +95,9 @@ a:hover {
     justify-content: center;
     align-items: center;
     height: 100vh;
+  }
+  .btn {
+    width: 50%;
   }
 
   .form {
