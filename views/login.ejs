@@ -6,6 +6,9 @@
       <div class="card">
         <div class="card-body">
           <form action="/login" method="POST">
+            <% if (error) { %>
+             <p class="error-msg"><%= error %></p>
+             <% } %>
             <div class="form-group">
               <label for="email">Email</label>
               <input type="email" class="form-control" name="username" required>

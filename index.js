@@ -12,10 +12,10 @@ mongoose.connect(MONGO_URI)
   .then(() => console.log("Connected to MongoDB Atlas"))
   .catch(err => console.log("MongoDB Connection Error:", err));
 
-// Schema
+
 const userSchema = new mongoose.Schema({
   name: String,
-  email: String,
+  email: { type: String, unique: true },
   password: String,
   secret: [String]
 });
@@ -24,76 +24,101 @@ let currentUserId = null;
 
 app.get("/", (req, res) => res.render("home"));
 
-app.get("/register", (req, res) => res.render("register"));
-
-app.get("/login", (req, res) => res.render("login"));
-
-app.get("/submit", (req, res) => {
-  if (!currentUserId) return res.redirect("/login");
-  res.render("submit");
+app.get("/register", (req, res) => {
+  const error = req.query.error;
+  res.render("register", { error });
 });
 
+app.get("/login", (req, res) => {
+  const error = req.query.error;
+  res.render("login", { error });
+});
+
+app.get("/submit", (req, res) => {
+  if (!currentUserId) 
+  return res.redirect("/login");
+  const error = req.query.error;
+  res.render("submit", { error });
+});
+
+
 app.get("/logout", (req, res) => {
+  currentUserId = null;
   res.redirect("/");
 });
 
 app.get("/secrets", (req, res) => {
   if (!currentUserId) return res.redirect("/login");
-
   User.findById(currentUserId)
     .then(user => {
       if (user) {
         res.render("secrets", { secret: user.secret });
       } else {
-        res.send("User not found.");
+        res.render("error", { message: "User not found." });
       }
     })
-    .catch(() => res.send("Error fetching secret."));
+    .catch(() => res.render("error", { message: "Error fetching secret." }));
 });
 
-app.post("/register", (req, res) => {
+
+
+app.post("/register", async (req, res) => {
   const { name, username, password } = req.body;
-
-  const newUser = new User({ name, email: username, password });
-
-  newUser.save()
-    .then(() => res.redirect("/login"))
-    .catch(() => res.send("Error registering user."));
+  try {
+    const existingUser = await User.findOne({ email: username });
+    if (existingUser) {
+      return res.redirect("/register?error=" + encodeURIComponent("Email is already registered."));
+    }
+    const newUser = new User({ name, email: username, password });
+    await newUser.save();
+    res.redirect("/login");
+  } catch (err) {
+    console.error(err);
+    res.redirect("/register?error=" + encodeURIComponent("Registration error."));
+  }
 });
+
+
 
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
-
   User.findOne({ email: username })
     .then(user => {
       if (!user) {
-        res.send("User not found.");
+        return res.redirect("/login?error=" + encodeURIComponent("User not found."));
       } else if (user.password !== password) {
-        res.send("Incorrect password.");
+        return res.redirect("/login?error=" + encodeURIComponent("Incorrect password."));
       } else {
         currentUserId = user._id;
-        res.redirect("/submit");
+        return res.redirect("/submit");
       }
     })
-    .catch(() => res.send("Login error."));
+    .catch(() => res.redirect("/login?error=" + encodeURIComponent("Login error.")));
 });
+
+
 
 app.post("/submit", (req, res) => {
   const submittedSecret = req.body.secret;
-  if (!currentUserId) return res.redirect("/login");
+  if (!currentUserId) 
+    return res.redirect("/login");
+  if (!submittedSecret || submittedSecret.trim() === "") {
+    return res.redirect("/submit?error=" + encodeURIComponent("Secret cannot be empty."));
+  }
   User.findById(currentUserId)
-  .then(user => {
-    if (user) {
-      user.secret.push(submittedSecret);
-      return user.save();
-    } else {
-      res.send("User not found.");
-    }
-  })
-  .then(() => res.redirect("/secrets"))
-  .catch(() => res.send("Error submitting secret."));
-
+    .then(user => {
+      if (user) {
+        user.secret.push(submittedSecret.trim());
+        return user.save();
+      } else {
+        res.render("error", { message: "User not found." });
+      }
+    })
+    .then(() => res.redirect("/secrets"))
+    .catch(() => res.redirect("/submit?error=" + encodeURIComponent("Error submitting secret.")));
 });
+
+
 app.listen(2000, () => {
   console.log("Server started on port 2000");
 });
