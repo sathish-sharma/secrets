@@ -68,14 +68,14 @@ app.post("/register", async (req, res) => {
   try {
     const existingUser = await User.findOne({ email: username });
     if (existingUser) {
-      return res.redirect("/register?error=" + encodeURIComponent("Email is already registered."));
+      return res.redirect("/register?error=" + encodeURIComponent("Email is already registered"));
     }
     const newUser = new User({ name, email: username, password });
     await newUser.save();
     res.redirect("/login");
   } catch (err) {
     console.error(err);
-    res.redirect("/register?error=" + encodeURIComponent("Registration error."));
+    res.redirect("/register?error=" + encodeURIComponent("Registration error"));
   }
 });
 
@@ -86,16 +86,17 @@ app.post("/login", (req, res) => {
   User.findOne({ email: username })
     .then(user => {
       if (!user) {
-        return res.redirect("/login?error=" + encodeURIComponent("User not found."));
+        return res.redirect("/login?error=" + encodeURIComponent("User not found"));
       } else if (user.password !== password) {
-        return res.redirect("/login?error=" + encodeURIComponent("Incorrect password."));
+        return res.redirect("/login?error=" + encodeURIComponent("Inalid Username or password"));
       } else {
         currentUserId = user._id;
         return res.redirect("/submit");
       }
     })
-    .catch(() => res.redirect("/login?error=" + encodeURIComponent("Login error.")));
+    .catch(() => res.redirect("/login?error=" + encodeURIComponent("Login error")));
 });
+
 
 
 
@@ -109,11 +110,11 @@ app.post("/submit", (req, res) => {
         user.secret.push(submittedSecret.trim());
         return user.save();
       } else {
-        res.render("error", { message: "User not found." });
+        res.render("error", { message: "User not found" });
       }
     })
     .then(() => res.redirect("/secrets"))
-    .catch(() => res.redirect("/submit?error=" + encodeURIComponent("Error submitting secret.")));
+    .catch(() => res.redirect("/submit?error=" + encodeURIComponent("Error submitting secret")));
 });
 
 
