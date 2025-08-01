@@ -48,7 +48,8 @@ app.get("/logout", (req, res) => {
 });
 
 app.get("/secrets", (req, res) => {
-  if (!currentUserId) return res.redirect("/login");
+  if (!currentUserId) 
+    return res.redirect("/login");
   User.findById(currentUserId)
     .then(user => {
       if (user) {
@@ -102,9 +103,6 @@ app.post("/submit", (req, res) => {
   const submittedSecret = req.body.secret;
   if (!currentUserId) 
     return res.redirect("/login");
-  if (!submittedSecret || submittedSecret.trim() === "") {
-    return res.redirect("/submit?error=" + encodeURIComponent("Secret cannot be empty."));
-  }
   User.findById(currentUserId)
     .then(user => {
       if (user) {
